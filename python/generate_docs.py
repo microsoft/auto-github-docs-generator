@@ -46,6 +46,24 @@ def call_webservice(data, api_key, url):
         print(error.read().decode("utf8", 'ignore'))
     return result
 
+
+
+# First, ask the openai endpoint to generate rst files
+
+# read prompt from topics_files_request.txt
+
+import os
+with open(os.path.join(".", "topics_files_request.txt"), "r") as f:
+    topics_files_request = f.read()
+
+print(topics_files_request)
+
+topics = call_webservice({"question": topics_files_request}, args.key, args.url)
+
+recommended_topics = topics["output"].split("\n")
+
+rst_file_names_request = "Generate the rst file names for the ml-wrappers repository from the topics: " + "\n".join(recommended_topics)
+
 sample_rst_files = ["contributing.rst",
                     "explainers.rst",
                     "importances.rst",
@@ -56,15 +74,9 @@ sample_rst_files = ["contributing.rst",
                     "usage.rst",
                     "visualizations.rst"]
 
-# First, ask the openai endpoint to generate rst files
-rst_files_request = ("Create a list of .rst files for all documentation " +
-                     "topics in the ml-wrappers repository.  This should " +
-                     "be in the following format\nExample: " +
-                     "\n".join(sample_rst_files))
+rst_file_names_request += "\nExample:" + "\n".join(sample_rst_files)
 
-print(rst_files_request)
-
-rst_files = call_webservice({"question": rst_files_request}, args.key, args.url)
+rst_files = call_webservice({"question": rst_file_names_request}, args.key, args.url)
 
 recommended_rst_files = rst_files["output"]
 
@@ -72,8 +84,8 @@ print(rst_files)
 
 list_rst_files = recommended_rst_files.split("\n")
 
-for rst_file in list_rst_files:
-    rst_gen_request = ("Generate the " + rst_file + " file for the ml-wrappers repository")
+for rst_file, topic in zip(list_rst_files, recommended_topics):
+    rst_gen_request = ("Generate the " + rst_file + " file for the ml-wrappers repository for the topic " + topic)
     rst_file_contents = call_webservice({"question": rst_gen_request}, args.key, args.url)
     print(rst_file_contents)
     with open(os.path.join(args.directory, rst_file), "w") as f:
