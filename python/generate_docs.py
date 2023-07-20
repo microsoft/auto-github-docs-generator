@@ -56,7 +56,9 @@ import os
 with open(os.path.join(".", "topics_files_request.txt"), "r") as f:
     topics_files_request = f.read()
 
+print("Topics files request:")
 print(topics_files_request)
+print("\n\n")
 
 topics = call_webservice({"question": topics_files_request}, args.key, args.url)
 
@@ -80,13 +82,17 @@ rst_files = call_webservice({"question": rst_file_names_request}, args.key, args
 
 recommended_rst_files = rst_files["output"]
 
+print("Recommended rst files:")
 print(rst_files)
+print("\n\n")
 
 list_rst_files = recommended_rst_files.split("\n")
 
 for rst_file, topic in zip(list_rst_files, recommended_topics):
     rst_gen_request = ("Generate the " + rst_file + " file for the ml-wrappers repository for the topic " + topic)
     rst_file_contents = call_webservice({"question": rst_gen_request}, args.key, args.url)
+    print("Rst file contents for file " + rst_file + " and topic " + topic + ":")
     print(rst_file_contents)
+    print("\n\n")
     with open(os.path.join(args.directory, rst_file), "w") as f:
         f.write(rst_file_contents["output"])
