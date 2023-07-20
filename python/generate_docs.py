@@ -9,6 +9,7 @@ import ssl
 # Parse input arguments
 parser = argparse.ArgumentParser()
 parser.add_argument('--directory', type=str, help='The directory path to generate the docs')
+parser.add_argument('--rootdirectory', type=str, help='The root directory path to the repository')
 parser.add_argument('--key', type=str, help='The webservice key')
 parser.add_argument('--url', type=str, help='The webservice url')
 args = parser.parse_args()
@@ -64,7 +65,7 @@ topics = call_webservice({"question": topics_files_request}, args.key, args.url)
 
 recommended_topics = topics["output"].split("\n")
 
-rst_file_names_request = "Generate the rst file names for the ml-wrappers repository from the topics: " + "\n".join(recommended_topics)
+rst_file_names_request = "Generate the rst file names for the ml-wrappers repository from the topics below.  Do not add numbers to the topics. " + "\n".join(recommended_topics)
 
 sample_rst_files = ["contributing.rst",
                     "explainers.rst",
@@ -89,10 +90,48 @@ print("\n\n")
 list_rst_files = recommended_rst_files.split("\n")
 
 for rst_file, topic in zip(list_rst_files, recommended_topics):
-    rst_gen_request = ("Generate the " + rst_file + " file for the ml-wrappers repository for the topic " + topic)
+    rst_gen_request = ("Generate the " + rst_file + " file for the ml-wrappers repository for the topic " + topic + ". Do not add numbers to the topics.")
     rst_file_contents = call_webservice({"question": rst_gen_request}, args.key, args.url)
     print("Rst file contents for file " + rst_file + " and topic " + topic + ":")
     print(rst_file_contents)
     print("\n\n")
     with open(os.path.join(args.directory, rst_file), "w") as f:
         f.write(rst_file_contents["output"])
+
+# ask the openai endpoint to generate the conf.py file
+
+conf_request = "Generate the conf.py file for the ml-wrappers repository.  This should be similar to the file https://github.com/interpretml/interpret-community/blob/main/python/docs/conf.py."
+conf_file_contents = call_webservice({"question": conf_request}, args.key, args.url)
+
+print("Conf file contents:")
+print(conf_file_contents)
+print("\n\n")
+
+with open(os.path.join(args.directory, "conf.py"), "w") as f:
+    f.write(conf_file_contents["output"])
+
+# ask the openai endpoint to generate the index.rst file
+
+index_request = "Generate the index.rst file for the ml-wrappers repository.  It should reference the previous generated rst files: " + "\n".join(list_rst_files)
+
+index_file_contents = call_webservice({"question": index_request}, args.key, args.url)
+
+print("Index file contents:")
+print(index_file_contents)
+print("\n\n")
+
+with open(os.path.join(args.directory, "index.rst"), "w") as f:
+    f.write(index_file_contents["output"])
+
+# ask the openai endpoint to generate the .readthedocs.yaml file
+
+readthedocs_request = "Generate the .readthedocs.yaml file for the ml-wrappers repository."
+
+readthedocs_file_contents = call_webservice({"question": readthedocs_request}, args.key, args.url)
+
+print("Readthedocs file contents:")
+print(readthedocs_file_contents)
+print("\n\n")
+
+with open(os.path.join(args.rootdirectory, ".readthedocs.yaml"), "w") as f:
+    f.write(readthedocs_file_contents["output"])
