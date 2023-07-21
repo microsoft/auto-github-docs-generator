@@ -1,5 +1,6 @@
 Create a list of documentation topics in the {repository_name} repository.
 Do not include information about the pypi package release process. Do not mention pypi releases.  Do not mention the release process.
+Ignore tests.  Do not add information about testing in the repository.
 
 Ignore the markdown files in the repository. Ignore the .md files in the repository.  Use the code in the repository to generate the documentation.
 
