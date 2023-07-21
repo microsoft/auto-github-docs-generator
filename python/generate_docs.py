@@ -21,7 +21,7 @@ def allowSelfSignedHttps(allowed):
     if allowed and not os.environ.get('PYTHONHTTPSVERIFY', '') and getattr(ssl, '_create_unverified_context', None):
         ssl._create_default_https_context = ssl._create_unverified_context
 
-def call_webservice(data, api_key, url):
+def call_webservice(data, api_key, url, retries=3):
     allowSelfSignedHttps(True) # this line is needed if you use self-signed certificate in your scoring service.
 
     body = str.encode(json.dumps(data))
@@ -42,11 +42,17 @@ def call_webservice(data, api_key, url):
         print(result)
         result = json.loads(result)
     except urllib.error.HTTPError as error:
-        print("The request failed with status code: " + str(error.code))
-
-        # Print the headers - they include the requert ID and the timestamp, which are useful for debugging the failure
-        print(error.info())
-        print(error.read().decode("utf8", 'ignore'))
+        if retries > 0:
+            print("The server couldn't fulfill the request")
+            print("Error code: " + str(error.code))
+            print("Retrying...")
+            return call_webservice(data, api_key, url, retries - 1)
+        else:
+            print("The request failed with status code: " + str(error.code))
+            # Print the headers - they include the requert ID and the timestamp, which are useful for debugging the failure
+            print(error.info())
+            print(error.read().decode("utf8", 'ignore'))
+            raise error
     return result
 
 def print_request_info(question, search):
@@ -76,7 +82,7 @@ with open(os.path.join(".", "topics_files_request.txt"), "r") as f:
     topics_files_request = f.read()
     topics_files_request = topics_files_request.replace("{repository_name}", args.repository_name)
 
-topics_search = "main top-level topics in ml-wrappers repository"
+topics_search = "main top-level topics in ml-wrappers repository, include mostly python .py files"
 
 print_request_info(topics_files_request, topics_search)
 
@@ -111,16 +117,26 @@ print_response(topics)
 
 list_rst_files = recommended_rst_files.split("\n")
 
+remove_bad_quotes = "Do not add any full sentences at the end describing the file. Do not add triple backticks to indicate the file type at the top."
+remove_test_info = " Ignore tests.  Do not add information about testing in the repository."
+
+prev_rst_file_contents = []
+
 # Ask the openai endpoint to generate an rst file for each topic
 for rst_file, topic in zip(list_rst_files, recommended_topics):
     rst_topic_search = topic
-    rst_gen_request = f"Generate the {rst_file} file for the {args.repository_name} repository for the topic {topic}. Do not add numbers to the topic. Output as a raw rst file. Do not add any full sentences at the end describing the file. Do not add triple backticks to indicate the file type at the top."
+    rst_gen_request = f"Generate the {rst_file} file for the {args.repository_name} repository for the topic {topic}. Do not add numbers to the topic. Output as a raw rst file. {remove_bad_quotes}"
+    rst_gen_request += remove_test_info
+    rst_gen_request += " This is one of the generated files from the list of files: " + "\n".join(list_rst_files)
+    # Seem to get error on this, perhaps due to too much data getting supplied:
+    # rst_gen_request += " The previous generated files had the contents: " + "\n".join(prev_rst_file_contents) + "\n\n"
     rst_file_contents = generate_file(rst_file, rst_topic_search, rst_gen_request, args.directory)
+    prev_rst_file_contents += [rst_file_contents["output"]]
 
 # Ask the openai endpoint to generate the conf.py, index.rst, and .readthedocs.yaml files
 requests = {
-    "conf.py": f"Generate the conf.py file for the {args.repository_name} repository.  This should be similar to the file https://github.com/interpretml/interpret-community/blob/main/python/docs/conf.py.",
-    "index.rst": f"Generate the index.rst file for the {args.repository_name} repository.  Produce the output as if it were an rst file (do not use triple backticks to indicate a codeblock).  It should reference the previous generated rst files: " + "\n".join(list_rst_files),
+    "conf.py": f"Generate the conf.py file for the {args.repository_name} repository.  This should be similar to the file https://github.com/interpretml/interpret-community/blob/main/python/docs/conf.py. {remove_bad_quotes}",
+    "index.rst": f"Generate the index.rst file for the {args.repository_name} repository.  Produce the output as if it were an rst file (do not use triple backticks to indicate a codeblock).  It should reference the previous generated rst files: " + "\n".join(list_rst_files) + f" {remove_bad_quotes}",
     # ".readthedocs.yaml": f"Generate the .readthedocs.yaml file for the {args.repository_name} repository.  Do not include any full sentences at the end describing the yaml."
 }
 
