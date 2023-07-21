@@ -1,8 +1,8 @@
-Create a list of documentation topics in the ml-wrappers repository.
+Create a list of documentation topics in the {repository_name} repository.
 Do not include information about the pypi package release process. Do not mention pypi releases.
 Ignore the markdown files in the repository. Instead, use the code in the repository to generate the documentation.
 
-This should be in the following format but tailored to the ml-wrappers repository.  Do not add numbers to the topics.
+This should be in the following format but tailored to the {repository_name} repository.  Topics should not be numbered or bulleted.  Do not begin any list item with a number or dash.
 
 Example 1:
 Overview
