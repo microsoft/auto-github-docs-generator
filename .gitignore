@@ -128,6 +128,9 @@ ENV/
 env.bak/
 venv.bak/
 
+# Vector Index local file usage
+workspace.json
+
 # Spyder project settings
 .spyderproject
 .spyproject
