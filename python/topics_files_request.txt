@@ -5,6 +5,7 @@ Ignore tests.  Do not add information about testing in the repository.
 Ignore the markdown files in the repository. Ignore the .md files in the repository.  Use the code in the repository to generate the documentation.
 
 This should be in the following format but tailored to the {repository_name} repository.  Topics should not be numbered or bulleted.  Do not begin any list item with a number or dash.
+Limit the list to ten topics or fewer.  Make sure to include an overview and API reference doc.
 
 Example 1:
 Overview
