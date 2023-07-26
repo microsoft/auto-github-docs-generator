@@ -8,7 +8,7 @@ https://clipchamp.com/watch/9agSQLTbEcV
 
 Goal of this project was to experiment with using OpenAI/GPT4 to generate documentation for OSS Github repositories.
 
-As part of this project, the following documentation website were automatically generated:
+As part of this project, the following documentation websites were automatically generated:
 
 https://vision-explanation-methods.readthedocs.io/en/latest/index.html
 https://ml-wrappers.readthedocs.io/en/latest/index.html
