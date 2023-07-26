@@ -1,14 +1,27 @@
 # Project
 
-> This repo has been populated by an initial template to help get you started. Please
-> make sure to update the content to build a great experience for community-building.
+Generate readthedocs website documentation for your github repository auto-magically using your LLM endpoint!
 
-As the maintainer of this project, please make a few updates:
+The auto-github-docs-generator repository started as an AzureML hackathon FHL (Fix, Hack, Learn) project developed over July 17-26.
+You can view the project video here:
+https://clipchamp.com/watch/9agSQLTbEcV
 
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
+Goal of this project was to experiment with using OpenAI/GPT4 to generate documentation for OSS Github repositories.
+
+As part of this project, the following documentation website were automatically generated:
+
+https://vision-explanation-methods.readthedocs.io/en/latest/index.html
+https://ml-wrappers.readthedocs.io/en/latest/index.html
+
+This document generator sends multiple prompts to generate the Github docs to the deployed endpoint:
+
+![image](https://github.com/microsoft/auto-github-docs-generator/assets/24683184/ea72345b-1a97-4a18-aaf9-3fa18b14cf4b)
+
+For this project the endpoint was a deployed webservice created from an AzureML promptflow pipeline:
+
+![image](https://github.com/microsoft/auto-github-docs-generator/assets/24683184/7f4cb3c9-4b34-4bbe-a11d-0c1709a3abb1)
+
+Contributions are welcome!
 
 ## Contributing
 
