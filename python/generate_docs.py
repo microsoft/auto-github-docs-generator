@@ -13,6 +13,7 @@ parser.add_argument('--rootdirectory', type=str, help='The root directory path t
 parser.add_argument('--key', type=str, help='The webservice key')
 parser.add_argument('--url', type=str, help='The webservice url')
 parser.add_argument('--repository-name', type=str, help='The repository name')
+parser.add_argument('--deployment-name', type=str, help='The deployment name')
 args = parser.parse_args()
 
 
@@ -31,7 +32,7 @@ def call_webservice(data, api_key, url, retries=3):
 
     # The azureml-model-deployment header will force the request to go to a specific deployment.
     # Remove this header to have the request observe the endpoint traffic rules
-    headers = {'Content-Type':'application/json', 'Authorization':('Bearer '+ api_key), 'azureml-model-deployment': 'blue' }
+    headers = {'Content-Type':'application/json', 'Authorization':('Bearer '+ api_key), 'azureml-model-deployment': args.deployment_name }
 
     req = urllib.request.Request(url, body, headers)
 
